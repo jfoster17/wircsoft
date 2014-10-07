@@ -89,7 +89,7 @@ if count GT 0 then sex_image(badpix)=999999
 writefits,'sex_temp.fits',sex_image,hd
 
 
-spawn,'/scisoft/bin/sex sex_temp.fits -c sex_files/fixwcs.sex > sex.log'
+spawn,'/scisoft/bin/sex sex_temp.fits -c ../scripts/sex_files/fixwcs.sex > sex.log'
 
 ; this checks for validity of the sextractor solution
 sex_detect=file_test('fixwcs.txt',/zero_length)
@@ -242,17 +242,18 @@ FILE_COPY,outname,'sex_temp.fits'
 
 ; JBF
 ; Run the new all-astrometric solution
-spawn,'/scisoft/bin/sex sex_temp.fits -c sex_files/newwcs.sex'
-spawn,'/scisoft/bin/scamp sex_temp.cat -c sex_files/newwcs.scamp -ASTREF_BAND '+filtername
+spawn,'/scisoft/bin/sex sex_temp.fits -c ../scripts/sex_files/newwcs.sex'
+spawn,'/scisoft/bin/scamp sex_temp.cat -c ../scripts/sex_files/newwcs.scamp -ASTREF_BAND '+filtername
 
 FILE_MOVE,'sex_temp.head',headfile
 ;FILE_COPY,outname,outname+".bck"
-spawn,'/scisoft/bin/missfits -c sex_files/newwcs.missfits '+outname ;This should output a .miss file
+spawn,'/scisoft/bin/missfits -c ../scripts/sex_files/newwcs.missfits '+outname ;This should output a .miss file
 FILE_DELETE,headfile
 
+;This is only necessary is we remove all the distortion parameters
 jim = readfits(outname,jh)
-sxdelpar,jh,['PV1_0','PV1_1','PV1_2','PV1_4','PV1_5','PV1_6','PV1_7','PV1_8','PV1_9','PV1_10']
-sxdelpar,jh,['PV2_0','PV2_1','PV2_2','PV2_4','PV2_5','PV2_6','PV2_7','PV2_8','PV2_9','PV2_10']
+;sxdelpar,jh,['PV1_0','PV1_1','PV1_2','PV1_4','PV1_5','PV1_6','PV1_7','PV1_8','PV1_9','PV1_10']
+;sxdelpar,jh,['PV2_0','PV2_1','PV2_2','PV2_4','PV2_5','PV2_6','PV2_7','PV2_8','PV2_9','PV2_10']
 writefits,outname,jim,jh
 FILE_DELETE,'sex_temp.fits'
 FILE_DELETE,'sex_temp.cat'

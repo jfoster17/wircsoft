@@ -78,6 +78,7 @@ if (keyword_set(DARKFILE) NE 1) then begin
 
 ; get the automatic dark files and test for existence
 darkfile=strcompress('dark_'+string(floor(exptime))+'_'+string(coadds)+'.fits',/remove_all)
+;print,darkfile
 filetest=file_test(darkfile)
 filetest2=file_test('darkmodel.fits')
 
@@ -140,7 +141,7 @@ for j=0,nfiles-1 do begin
            filename=strcompress('mask_'+infile[j],/remove_all)
            if (RUN EQ 2) then begin
               objmask = convol(readfits(filename),kernel)
-              bpmmask = readfits("bpm.fits")
+              bpmmask = readfits("../scripts/bpm.fits")
               mask = objmask or bpmmask
               masks[*,*,count]=mask
               endif
@@ -262,7 +263,7 @@ if (RUN EQ 1) then begin
          if badpixcount GT 0 then out2[badpix]=999999
       writefits,'sex_temp.fits',out2,hd
       print,'Running SExtractor'
-      spawn,'/scisoft/bin/sex sex_temp.fits -c sex_files/preproc_mask.sex '
+      spawn,'/scisoft/bin/sex sex_temp.fits -c ../scripts/sex_files/preproc_mask.sex '
       mask=readfits('check.fits',mask_hd)
 
 

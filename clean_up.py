@@ -1,3 +1,4 @@
+#!/scisoft/bin/python
 """
 Clean up a directory
 
@@ -42,7 +43,10 @@ def main():
             shutil.move("mask_"+base,objname)
         except shutil.Error:
             pass
+
     for file in glob.glob(objname+"*"):
+        shutil.move(file,objname)
+    for file in glob.glob("*.png"):
         shutil.move(file,objname)
 
     ff.close()

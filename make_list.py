@@ -1,3 +1,4 @@
+#!/scisoft/bin/python
 """
 Make a list of files for use in WIRCSOFT
 

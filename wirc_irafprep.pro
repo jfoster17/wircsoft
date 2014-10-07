@@ -228,9 +228,9 @@ spawn,'ls prep_temp/prep*fits > prep_temp.list'
 
 ; now swarp them
 if keyword_set(COVMAP) then begin
-    spawn,"swarp prep_temp/*fits -c sex_files/wirc_irafprep_covmap.swarp"
+    spawn,"swarp prep_temp/*fits -c ../scripts/sex_files/wirc_irafprep_covmap.swarp"
 endif else begin
-    spawn,"swarp prep_temp/*fits -c sex_files/wirc_irafprep.swarp"
+    spawn,"swarp prep_temp/*fits -c ../scripts/sex_files/wirc_irafprep.swarp"
 endelse
 
 ; make new filelists

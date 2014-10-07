@@ -40,7 +40,7 @@ if count GT 0 then sex_image(badpix)=999999
 ;  to get the comparison source list
 if keyword_set(VERBOSE) then print,'Running sextractor.'
 writefits,'sex_temp.fits',sex_image,hd
-spawn,'/scisoft/bin/sex sex_temp.fits -c sex_files/finalcalib.sex > sex.log'
+spawn,'/scisoft/bin/sex sex_temp.fits -c ../scripts/sex_files/finalcalib.sex > sex.log'
 
 ; delete the temporary file
 spawn,'rm sex_temp.fits'

@@ -28,16 +28,16 @@ REFOUT_CATPATH         .               # Save path for reference catalogs
 #--------------------------- Merged output catalogs ---------------------------
  
 MERGEDOUTCAT_NAME      scamp.cat       # Merged output catalog filename
-MERGEDOUTCAT_TYPE      NONE            # NONE, ASCII_HEAD, ASCII, FITS_LDAC
+MERGEDOUTCAT_TYPE      ASCII_HEAD            # NONE, ASCII_HEAD, ASCII, FITS_LDAC
  
 #----------------------------- Pattern matching -------------------------------
  
 MATCH                  Y               # Do pattern-matching (Y/N) ?
 MATCH_NMAX             0               # Max.number of detections for MATCHing
                                        # (0=auto)
-PIXSCALE_MAXERR        1.2             # Max scale-factor uncertainty
-POSANGLE_MAXERR        5.0             # Max position-angle uncertainty (deg)
-POSITION_MAXERR        0.5             # Max positional uncertainty (arcmin)
+PIXSCALE_MAXERR        1.1             # Max scale-factor uncertainty
+POSANGLE_MAXERR        10.0            # Max position-angle uncertainty (deg)
+POSITION_MAXERR        0.1             # Max positional uncertainty (arcmin)
 MATCH_RESOL            0               # Matching resolution (arcsec); 0=auto
 MATCH_FLIPPED          N               # Allow matching with flipped axes?
 MOSAIC_TYPE            UNCHANGED       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
@@ -45,7 +45,7 @@ MOSAIC_TYPE            UNCHANGED       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
  
 #---------------------------- Cross-identification ----------------------------
  
-CROSSID_RADIUS         10.0             # Cross-id initial radius (arcsec)
+CROSSID_RADIUS         2.0             # Cross-id initial radius (arcsec)
  
 #---------------------------- Astrometric solution ----------------------------
  
@@ -57,7 +57,7 @@ CENTROIDERR_KEYS       ERRAWIN_IMAGE,ERRBWIN_IMAGE,ERRTHETAWIN_IMAGE
                                        # Cat. params for centroid err ellipse
 DISTORT_KEYS           XWIN_IMAGE,YWIN_IMAGE # Cat. parameters or FITS keywords
 DISTORT_GROUPS         1,1             # Polynom group for each context key
-DISTORT_DEGREES        1               # Polynom degree for each group
+DISTORT_DEGREES        3               # Polynom degree for each group
  
 #---------------------------- Photometric solution ----------------------------
  
@@ -76,10 +76,10 @@ PHOTFLUXERR_KEY        FLUXERR_AUTO    # Catalog parameter for the flux error
  
 #------------------------------- Check-plots ----------------------------------
  
-CHECKPLOT_DEV          NULL             # NULL, XWIN, TK, PS, PSC, XFIG, PNG,
+CHECKPLOT_DEV          PNG             # NULL, XWIN, TK, PS, PSC, XFIG, PNG,
                                        # JPEG, AQT, PDF or SVG
-CHECKPLOT_TYPE         FGROUPS,DISTORTION,ASTR_INTERROR2D,ASTR_INTERROR1D,ASTR_REFERROR2D,ASTR_REFERROR1D,ASTR_CHI2,PHOT_ERROR
-CHECKPLOT_NAME         fgroups,distort,astr_interror2d,astr_interror1d,astr_referror2d,astr_referror1d,astr_chi2,psphot_error # Check-plot filename(s)
+CHECKPLOT_TYPE         DISTORTION,ASTR_REFERROR2D,ASTR_REFERROR1D,ASTR_CHI2
+CHECKPLOT_NAME         distort,astr_referror2d,astr_referror1d,astr_chi2 # Check-plot filename(s)
  
 #------------------------------ Miscellaneous ---------------------------------
  
