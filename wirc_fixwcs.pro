@@ -18,6 +18,7 @@ readcol,inlist,infile,format="A"
 readcol,catalog,mra,mdec,j,h,k
 
 
+
 ; determine which magnitude to compare against
 hd=headfits(infile[0])
 filter2=sxpar(hd,'AFT')
@@ -45,7 +46,16 @@ case 1 of
          end
    endcase
 
-
+;START JBF 
+;Condition the 2MASS catalog to only contain stars in a useful
+;magnitude range
+if filtername eq "Ks" then good = where(compmag lt 12 and compmag gt 9)
+if filtername eq "H"  then good = where(compmag lt 13 and compmag gt 10)
+if filtername eq "J"  then good = where(compmag lt 14 and compmag gt 11)
+mra = mra[good]
+mdec = mdec[good]
+compmag = compmag[good]
+;END JBF
 
 nfiles=n_elements(infile)
 nstars=n_elements(mra)

@@ -31,17 +31,25 @@ def main():
             shutil.move("ff_"+base,objname)
         except shutil.Error:
             pass
+        except IOError:
+            pass
         try:
             shutil.move("wcs_ff_"+base,objname)
         except shutil.Error:
+            pass
+        except IOError:
             pass
         try:
             shutil.move("prep_wcs_ff_"+base,objname)
         except shutil.Error:
             pass
+        except IOError:
+            pass
         try:
             shutil.move("mask_"+base,objname)
         except shutil.Error:
+            pass
+        except IOError:
             pass
 
     for file in glob.glob(objname+"*"):

@@ -17,7 +17,7 @@ pro wirc_irafprep,inlist,$
 
 ; set FLATCUT equal to a value if not set
 ; I have essentially disabled this JBF. Old value = 0.7
-if (keyword_set(FLATCUT) NE 1) then FLATCUT=0.01
+if (keyword_set(FLATCUT) NE 1) then FLATCUT=0.0001
 
 ; set the initial bad pixel value
 if keyword_set(REPROJECT) then badpixval=sqrt(-1) else badpixval=-99999
@@ -274,7 +274,7 @@ spawn,'rm prep_temp.list'
 spawn,'rm prep_temp2.list'
 spawn,'rm prep_temp3.list'
 ;JBF restore
-;spawn,'rm -r prep_temp'
+spawn,'rm -r prep_temp'
 
 endif
 

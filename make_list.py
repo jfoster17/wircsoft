@@ -36,7 +36,7 @@ def main():
             sys.exit(2)
     ff = open(name+".list",'w')
 
-    for i in range(int(lower),int(upper)):
+    for i in range(int(lower),int(upper)+1):
         ff.write("wirc"+str(i).zfill(4)+".fits\n")
     ff.close()
 
