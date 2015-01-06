@@ -4,6 +4,8 @@
 ;
 ; cognoscenti will recognize descent from dim-sum
 ;
+; 1/06/15  Branch version to handle separate
+;          sky and object images JBF
 ; 4/29/08  cal file handling re-written  JAS
 ; 5/01/08  added file compression option
 ;          stopped saving sky frames by default
