@@ -13,7 +13,8 @@
 ; 5/29/08  fixed a problem in the where statement for sextractor
 ;
 ;
-pro wirc_runningskysub,inlist,$
+pro wirc_runningskysub,skylist,$ ;list of sky frames
+                       objlist,$ ;list of obj frames
                        timeradius,$ ; radius (in images) forward and back
                        RUN=RUN,$ ; should be 1 or 2
                        FLATFILE=FLATFILE,$ ; alternative flatfield
@@ -33,15 +34,19 @@ start_time=systime(/seconds)
 kernel=fltarr(5,5)
 kernel[*]=1
 
-; read in the input list
-readcol,inlist,infile,format="a"
-nfiles=n_elements(infile)
+; read in the input lists
+readcol,skylist,skyfile,format="a"
+readcol,objlist,objfile,format="a"
+
+nobjfiles=n_elements(objfile)
+nskyfiles=n_elements(skyfile)
 ; this list will be manipulated to decide which files get included 
-list=fltarr(nfiles)
-list[*]=0
+; for the sky subtraction
+mod_sky_list=fltarr(nskyfiles)
+mod_sky_list[*]=0
 
 ; get the calibration frames
-hd=headfits(infile[0])
+hd=headfits(objfile[0])
 exptime=sxpar(hd,'EXPTIME')
 filter2=sxpar(hd,'AFT')
 coadds=sxpar(hd,'COADDS')
@@ -110,37 +115,34 @@ endif else begin
    endelse
 
 ; make the running sky sub frame
-for i=0,nfiles-1 do begin
+for i=0,nobjfiles-1 do begin
 
-list[*]=0
-
-; figure out infile subrange
-case 1 of
-  (i LT timeradius): list[0:(timeradius*2)]=1
-  (i GT (nfiles-timeradius-1)): list[(nfiles-1-2*timeradius):nfiles-1]=1
-   else: list[(i-timeradius):(i+timeradius)]=1
+mod_sky_list[*]=0
+chunk = i/3
+nn = objlen/3-1
+case chunk of
+   0: mod_sky_list[0:2] = 1
+   nn: mod_sky_list[skylen-3:skylen-1] = 1
+   else: mod_sky_list[chunk*3-3:chunk*3+3-1] = 1
 endcase
-      
-;this eliminates the current image from being included in the stack
-list[i]=0
       
 print,'--------------'      
 print,i,'    ',infile[i] 
 print,'--------------'  
-print,infile[where(list EQ 1)]
+print,infile[where(mod_sky_list EQ 1)]
       
 ;load the background images
-numimages=n_elements(where(list EQ 1))
+numimages=n_elements(where(mod_sky_list EQ 1))
 images=fltarr(2048,2048,numimages)
 masks=fltarr(2048,2048,numimages)
 masks[*,*,*]=0
 
 count=0
-for j=0,nfiles-1 do begin
+for j=0,nskyfiles-1 do begin
 
-    if (list[j] EQ 1) then begin
-           images[*,*,count]=readfits(infile[j])
-           filename=strcompress('mask_'+infile[j],/remove_all)
+    if (nskyfiles[j] EQ 1) then begin
+           images[*,*,count]=readfits(skyfile[j])
+           filename=strcompress('mask_'+skyfile[j],/remove_all)
            if (RUN EQ 2) then begin
               objmask = convol(readfits(filename),kernel)
               bpmmask = readfits("../scripts/bpm.fits")
@@ -153,7 +155,7 @@ for j=0,nfiles-1 do begin
 endfor
 
 ; now read in the actual data
-image2=readfits(infile[i],hd)-dark
+image2=readfits(objfile[i],hd)-dark
 data_background=median(image2)
 
 
@@ -186,10 +188,10 @@ out=median(images,DIMENSION=3)
 
 
 ; get the output file basename
-if (strlowcase(strmid(infile[i],2,3,/reverse)) EQ '.gz' ) then begin
-       outbase=strmid(infile[i],0,strlen(infile[i])-3)
+if (strlowcase(strmid(objfile[i],2,3,/reverse)) EQ '.gz' ) then begin
+       outbase=strmid(objfile[i],0,strlen(objfile[i])-3)
     endif else begin
-       outbase=infile[i]
+       outbase=objfile[i]
     endelse
 
 ; finally, write the output sky image
