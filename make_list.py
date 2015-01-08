@@ -43,6 +43,7 @@ def main():
                            #sky/obj before switching
         ff = open(name+"_obj.list",'w')
         gg = open(name+"_sky.list",'w')
+        hh = open(name+".list",'w')
         counter = 0
         now_on_obj = True #Start on object
         for i in range(int(lower),int(upper)+1):
@@ -55,8 +56,10 @@ def main():
             if counter == pattern_length:
                 now_on_obj = not now_on_obj
                 counter = 0
+            hh.write("wirc"+str(i).zfill(4)+".fits\n")
         ff.close()
         gg.close()
+        hh.close()
     else:
         ff = open(name+".list",'w')
 

@@ -13,8 +13,7 @@
 ; 5/29/08  fixed a problem in the where statement for sextractor
 ;
 ;
-pro wirc_runningskysub,skylist,$ ;list of sky frames
-                       objlist,$ ;list of obj frames
+pro wirc_runningskysub,inlist,$ ;list of all frames
                        timeradius,$ ; radius (in images) forward and back
                        RUN=RUN,$ ; should be 1 or 2
                        FLATFILE=FLATFILE,$ ; alternative flatfield
@@ -34,16 +33,27 @@ start_time=systime(/seconds)
 kernel=fltarr(5,5)
 kernel[*]=1
 
+yo = strsplit(inlist,'.',/extract)
+
+skylist = yo[0]+"_sky.list"
+objlist = yo[0]+"_obj.list"
+
 ; read in the input lists
 readcol,skylist,skyfile,format="a"
 readcol,objlist,objfile,format="a"
+readcol,inlist,infile,format="a"
 
 nobjfiles=n_elements(objfile)
 nskyfiles=n_elements(skyfile)
+objlen = nobjfiles
+skylen = nskyfiles
 ; this list will be manipulated to decide which files get included 
 ; for the sky subtraction
-mod_sky_list=fltarr(nskyfiles)
+mod_sky_list=intarr(nskyfiles)
 mod_sky_list[*]=0
+mod_full_list = intarr(nskyfiles+nobjfiles)
+mod_full_list[*] = 0
+stackedfile = [objfile,skyfile]
 
 ; get the calibration frames
 hd=headfits(objfile[0])
@@ -115,21 +125,49 @@ endif else begin
    endelse
 
 ; make the running sky sub frame
-for i=0,nobjfiles-1 do begin
+for i=0,nobjfiles+nskyfiles-1 do begin
 
-mod_sky_list[*]=0
-chunk = i/3
-nn = objlen/3-1
-case chunk of
-   0: mod_sky_list[0:2] = 1
-   nn: mod_sky_list[skylen-3:skylen-1] = 1
-   else: mod_sky_list[chunk*3-3:chunk*3+3-1] = 1
-endcase
-      
+
+if i lt nobjfiles then begin ;Do the object frames
+   doing_obj = 1
+   doing_sky = 0
+endif else begin ;Do the sky frames
+   doing_sky = 1
+   doing_obj = 0
+endelse      
+
+if doing_obj then begin
+   mod_sky_list = intarr(skylen)
+   mod_sky_list[*]=0
+   chunk = i/3
+   nn = objlen/3-1
+   case chunk of
+      0: mod_sky_list[0:2] = 1
+      nn: mod_sky_list[skylen-3:skylen-1] = 1
+      else: mod_sky_list[chunk*3-3:chunk*3+3-1] = 1
+   endcase
+   currfile = objfile[i]
+endif else begin
+   mod_full_list = intarr(skylen+objlen)
+   mod_full_list[*] = 0
+   kk = i-objlen
+   chunk = kk/3+1
+   jj = kk+chunk*3
+   mod_full_list[jj-3:jj+3] = 1
+   mod_full_list[jj] = 0
+   mod_sky_list = mod_full_list
+   ;Crude hack. Just declare these full lists
+   ;as the sky lists. Works because we do 
+   ;sky frames after all the object frames.
+   nskyfiles = skylen+objlen
+   skyfile = infile
+   currfile = stackedfile[i]
+endelse
+
 print,'--------------'      
-print,i,'    ',infile[i] 
+print,i,'    ',currfile
 print,'--------------'  
-print,infile[where(mod_sky_list EQ 1)]
+print,skyfile[where(mod_sky_list EQ 1)]
       
 ;load the background images
 numimages=n_elements(where(mod_sky_list EQ 1))
@@ -140,7 +178,7 @@ masks[*,*,*]=0
 count=0
 for j=0,nskyfiles-1 do begin
 
-    if (nskyfiles[j] EQ 1) then begin
+    if (mod_sky_list[j] EQ 1) then begin
            images[*,*,count]=readfits(skyfile[j])
            filename=strcompress('mask_'+skyfile[j],/remove_all)
            if (RUN EQ 2) then begin
@@ -153,9 +191,9 @@ for j=0,nskyfiles-1 do begin
            endif
            
 endfor
-
+print,currfile
 ; now read in the actual data
-image2=readfits(objfile[i],hd)-dark
+image2=readfits(currfile,hd)-dark
 data_background=median(image2)
 
 
@@ -188,10 +226,10 @@ out=median(images,DIMENSION=3)
 
 
 ; get the output file basename
-if (strlowcase(strmid(objfile[i],2,3,/reverse)) EQ '.gz' ) then begin
-       outbase=strmid(objfile[i],0,strlen(objfile[i])-3)
+if (strlowcase(strmid(currfile,2,3,/reverse)) EQ '.gz' ) then begin
+       outbase=strmid(currfile,0,strlen(currfile)-3)
     endif else begin
-       outbase=objfile[i]
+       outbase=currfile
     endelse
 
 ; finally, write the output sky image
